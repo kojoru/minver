@@ -5,8 +5,8 @@ using MinVer.Lib;
 using MinVerTests.Lib.Infra;
 using Xbehave;
 using Xunit;
-using static MinVerTests.Lib.Infra.FileSystem;
-using static MinVerTests.Lib.Infra.Git;
+using static MinVerTests.Infra.FileSystem;
+using static MinVerTests.Infra.Git;
 using static SimpleExec.Command;
 using Version = MinVer.Lib.Version;
 

@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using Bullseye;
 using Xunit;
 using static Bullseye.Targets;
-using static MinVerTests.Lib.Infra.FileSystem;
-using static MinVerTests.Lib.Infra.Git;
+using static MinVerTests.Infra.FileSystem;
+using static MinVerTests.Infra.Git;
 using static SimpleExec.Command;
 
 var testPackageBaseOutput = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
