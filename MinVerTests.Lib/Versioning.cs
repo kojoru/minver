@@ -7,7 +7,6 @@ using Xbehave;
 using Xunit;
 using static MinVerTests.Infra.FileSystem;
 using static MinVerTests.Infra.Git;
-using static SimpleExec.Command;
 using Version = MinVer.Lib.Version;
 
 namespace MinVerTests.Lib

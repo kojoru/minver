@@ -1,49 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CliWrap;
+using CliWrap.Buffered;
 using static MinVerTests.Infra.FileSystem;
-using static SimpleExec.Command;
 
 namespace MinVerTests.Infra
 {
     public static class Git
     {
-        public static void EnsureEmptyRepositoryAndCommit(string path)
+        public static async Task EnsureEmptyRepositoryAndCommit(string path)
         {
-            EnsureEmptyRepository(path);
-            Commit(path);
+            await EnsureEmptyRepository(path);
+            await Commit(path);
         }
 
-        public static void Commit(string path) => Run("git", "commit -m '.' --allow-empty", path);
+        public static Task Commit(string path) =>
+            Cli.Wrap("git").WithArguments("commit -m '.' --allow-empty").WithWorkingDirectory(path).ExecuteAsync();
 
-        public static void EnsureEmptyRepository(string path)
+        public static async Task EnsureEmptyRepository(string path)
         {
             EnsureEmptyDirectory(path);
-            Init(path);
-            PrepareForCommits(path);
+            await Init(path);
+            await PrepareForCommits(path);
         }
 
-        public static void Init(string path) => Run("git", "init", path);
+        public static Task Init(string path) =>
+            Cli.Wrap("git").WithArguments("init").WithWorkingDirectory(path).ExecuteAsync();
 
-        public static void PrepareForCommits(string path)
+        public static async Task PrepareForCommits(string path)
         {
-            Run("git", "config user.email johndoe@tempuri.org", path);
-            Run("git", "config user.name John Doe", path);
-            Run("git", "config commit.gpgsign false", path);
+            _ = await Cli.Wrap("git").WithArguments("config user.email johndoe@tempuri.org").WithWorkingDirectory(path).ExecuteAsync();
+            _ = await Cli.Wrap("git").WithArguments("config user.name John Doe").WithWorkingDirectory(path).ExecuteAsync();
+            _ = await Cli.Wrap("git").WithArguments("config commit.gpgsign false").WithWorkingDirectory(path).ExecuteAsync();
         }
 
-        public static Task<string> GetGraph(string path) => ReadAsync("git", "log --graph --pretty=format:'%d'", path);
+        public static async Task<string> GetGraph(string path) =>
+            (await Cli.Wrap("git").WithArguments("log --graph --pretty=format:'%d'").WithWorkingDirectory(path).ExecuteBufferedAsync())
+                .StandardOutput;
 
-        public static void Tag(string path, string tag) => Run("git", $"tag {tag}", path);
+        public static Task Tag(string path, string tag) =>
+            Cli.Wrap("git").WithArguments($"tag {tag}").WithWorkingDirectory(path).ExecuteAsync();
 
-        public static void Tag(string path, string tagName, string sha) => Run("git", $"tag {tagName} {sha}", path);
+        public static Task Tag(string path, string tagName, string sha) =>
+            Cli.Wrap("git").WithArguments($"tag {tagName} {sha}").WithWorkingDirectory(path).ExecuteAsync();
 
-        public static void AnnotatedTag(string path, string tag, string message) => Run("git", $"tag {tag} -a -m '{message}'", path);
+        public static Task AnnotatedTag(string path, string tag, string message) =>
+            Cli.Wrap("git").WithArguments($"tag {tag} -a -m '{message}'").WithWorkingDirectory(path).ExecuteAsync();
 
-        public static IEnumerable<string> GetCommitShas(string path) =>
-            Read("git", "log --pretty=format:\"%H\"", path, noEcho: true)
+        public static async Task<IEnumerable<string>> GetCommitShas(string path) =>
+            (await Cli.Wrap("git").WithArguments("log --pretty=format:\"%H\"").WithWorkingDirectory(path).ExecuteBufferedAsync())
+                .StandardOutput
                 .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-        public static void Checkout(string path, string sha) => Run("git", $"checkout {sha}", path);
+        public static Task Checkout(string path, string sha) => Cli.Wrap("git").WithArguments($"checkout {sha}").WithWorkingDirectory(path).ExecuteAsync();
     }
 }
