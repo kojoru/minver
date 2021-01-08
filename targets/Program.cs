@@ -50,7 +50,13 @@ void RunTargets(IEnumerable<string> targets, Options options, string packageTest
         "test-lib",
         "test the MinVer.Lib library",
         DependsOn("build"),
-        () => RunAsync("dotnet", "test --configuration Release --no-build --nologo"));
+        () => RunAsync("dotnet", "test ./MinVerTests.Lib --configuration Release --no-build --nologo"));
+
+    Target(
+        "test-packages",
+        "test the MinVer package and the minver-cli console app",
+        DependsOn("build"),
+        () => RunAsync("dotnet", "test ./MinVerTests.Packages --configuration Release --no-build --nologo"));
 
     string testProject = default;
 
@@ -84,46 +90,8 @@ $@"{{
         });
 
     Target(
-        "test-package-no-repo",
-        DependsOn("create-test-project"),
-        async () =>
-        {
-            // arrange
-            var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-no-repo");
-
-            // act
-            await CleanAndPack(testProject, output, "diagnostic", packageTestsSdk);
-
-            // assert
-            AssertVersion(new Version(0, 0, 0, new[] { "alpha", "0" }), output);
-
-            // cli
-            Assert.Equal($"0.0.0-alpha.0+build.{buildNumber}", await RunCliAsync(testProject, "trace"));
-        });
-
-    Target(
-        "test-package-no-commits",
-        DependsOn("test-package-no-repo"),
-        async () =>
-        {
-            // arrange
-            Init(testProject);
-
-            var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-no-commits");
-
-            // act
-            await CleanAndPack(testProject, output, "diagnostic", packageTestsSdk);
-
-            // assert
-            AssertVersion(new Version(0, 0, 0, new[] { "alpha", "0" }), output);
-
-            // cli
-            Assert.Equal($"0.0.0-alpha.0+build.{buildNumber}", await RunCliAsync(testProject, "trace"));
-        });
-
-    Target(
         "test-package-commit",
-        DependsOn("test-package-no-commits"),
+        DependsOn("create-test-project"),
         async () =>
         {
             // arrange
