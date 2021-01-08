@@ -23,7 +23,7 @@ namespace MinVerTests.Packages
             AssertEx.Version(new Version(0, 0, 0, new[] { "alpha", "0" }), output);
 
             // cli
-            Assert.Equal($"0.0.0-alpha.0+build.{123}", await Cli.RunAsync(project, "trace", 123));
+            Assert.Equal($"0.0.0-alpha.0+build.{123}", await MinVerCli.RunAsync(project, "trace", 123));
         }
     }
 }
