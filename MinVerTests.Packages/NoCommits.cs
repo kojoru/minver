@@ -14,7 +14,7 @@ namespace MinVerTests.Packages
             // arrange
             var output = Path.Combine(Tests.TestPackageBaseOutput, "no-commits");
             var project = await Project.Create("no-commits");
-            Init(project);
+            await Init(project);
 
             // act
             await Project.CleanAndPack(project, 123, output, "diagnostic");

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MinVerTests.Packages.Infra;
 using static MinVerTests.Infra.FileSystem;
-using static SimpleExec.Command;
 
 namespace MinVerTests.Packages
 {

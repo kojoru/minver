@@ -95,8 +95,8 @@ $@"{{
         async () =>
         {
             // arrange
-            PrepareForCommits(testProject);
-            Commit(testProject);
+            await PrepareForCommits(testProject);
+            await Commit(testProject);
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-commit");
 
@@ -116,7 +116,7 @@ $@"{{
         async () =>
         {
             // arrange
-            Tag(testProject, "foo");
+            await Tag(testProject, "foo");
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-non-version-tag");
 
@@ -136,7 +136,7 @@ $@"{{
         async () =>
         {
             // arrange
-            Tag(testProject, "v.1.2.3+foo");
+            await Tag(testProject, "v.1.2.3+foo");
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-version-tag");
 
@@ -156,8 +156,8 @@ $@"{{
         async () =>
         {
             // arrange
-            Tag(testProject, "1.2.3+foo");
-            Commit(testProject);
+            await Tag(testProject, "1.2.3+foo");
+            await Commit(testProject);
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-commit-after-tag");
 
@@ -195,7 +195,7 @@ $@"{{
         async () =>
         {
             // arrange
-            AnnotatedTag(testProject, "1.4.0", "foo");
+            await AnnotatedTag(testProject, "1.4.0", "foo");
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-annotated-tag");
 
@@ -215,8 +215,8 @@ $@"{{
         async () =>
         {
             // arrange
-            Commit(testProject);
-            Tag(testProject, "1.5.0");
+            await Commit(testProject);
+            await Tag(testProject, "1.5.0");
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-minimum-major-minor-on-tag");
 
@@ -236,7 +236,7 @@ $@"{{
         async () =>
         {
             // arrange
-            Commit(testProject);
+            await Commit(testProject);
 
             var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-minimum-major-minor-after-tag");
 

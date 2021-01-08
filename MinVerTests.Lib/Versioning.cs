@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CliWrap;
 using MinVer.Lib;
 using MinVerTests.Lib.Infra;
 using Xbehave;
@@ -72,23 +73,23 @@ git tag 1.1.0 -a -m '.'
             $"Given a git repository in '{path = GetScenarioDirectory("versioning-repo-with-history-" + name)}' with a history of branches and/or tags"
                 .x(async () =>
                 {
-                    EnsureEmptyRepositoryAndCommit(path);
+                    await EnsureEmptyRepositoryAndCommit(path);
 
                     foreach (var command in historicalCommands[name].Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         var nameAndArgs = command.Split(" ", 2);
-                        await RunAsync(nameAndArgs[0], nameAndArgs[1], path);
+                        await Cli.Wrap(nameAndArgs[0]).WithArguments(nameAndArgs[1]).WithWorkingDirectory(path).ExecuteAsync();
                         await Task.Delay(200);
                     }
                 });
 
             "When the version is determined for every commit"
-                .x(() =>
+                .x(async () =>
                 {
                     var versionCounts = new Dictionary<string, int>();
-                    foreach (var sha in GetCommitShas(path))
+                    foreach (var sha in await GetCommitShas(path))
                     {
-                        Checkout(path, sha);
+                        await Checkout(path, sha);
 
                         var version = Versioner.GetVersion(path, default, default, default, default, default, new TestLogger());
                         var versionString = version.ToString();
@@ -102,10 +103,10 @@ git tag 1.1.0 -a -m '.'
                             ? $"v({versionCount})/{versionString}"
                             : tagName;
 
-                        Tag(path, tagName, sha);
+                        await Tag(path, tagName, sha);
                     }
 
-                    Checkout(path, "master");
+                    await Checkout(path, "master");
                 });
 
             "Then the versions are as expected"
