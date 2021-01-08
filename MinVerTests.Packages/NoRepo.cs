@@ -7,19 +7,21 @@ namespace MinVerTests.Packages
 {
     public static class NoRepo
     {
-        public static async Task VersioningNoRepo()
+        [Fact]
+        public static async Task NoRepoHasDefaultVersion()
         {
             // arrange
-            var output = Path.Combine(Tests.TestPackageBaseOutput, $"{buildNumber}-test-package-no-repo");
+            var output = Path.Combine(Tests.TestPackageBaseOutput, "no-repo");
+            var project = await Project.Create("no-repo");
 
             // act
-            await CleanAndPack(testProject, output, "diagnostic", packageTestsSdk);
+            await Project.CleanAndPack(project, 123, output, "diagnostic");
 
             // assert
-            AssertVersion(new Version(0, 0, 0, new[] { "alpha", "0" }), output);
+            AssertEx.Version(new Version(0, 0, 0, new[] { "alpha", "0" }), output);
 
             // cli
-            Assert.Equal($"0.0.0-alpha.0+build.{buildNumber}", await Cli.RunAsync(testProject, "trace", buildNumber));
+            Assert.Equal($"0.0.0-alpha.0+build.{123}", await Cli.RunAsync(project, "trace", 123));
         }
     }
 }
