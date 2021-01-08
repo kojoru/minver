@@ -21,6 +21,7 @@ namespace MinVerTests.Packages.Infra
                         .Set("MinVerVerbosity".ToAltCase(), verbosity ?? "")
                         .Build())
                         .ExecuteBufferedAsync())
-                .StandardOutput;
+                .StandardOutput
+                .Trim();
     }
 }

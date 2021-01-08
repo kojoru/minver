@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CliWrap;
+using CliWrap.Builders;
 using MinVerTests.Packages.Infra;
 using static MinVerTests.Infra.FileSystem;
 
@@ -36,31 +38,33 @@ $@"{{
 ");
             }
 
-            await RunAsync("dotnet", "new classlib", path);
-            await RunAsync("dotnet", $"add package MinVer --source {source} --version {version} --package-directory packages", path);
-            await RunAsync("dotnet", $"restore --source {source} --packages packages", path);
+            await Cli.Wrap("dotnet").WithArguments("new classlib").WithWorkingDirectory(path).ExecuteAsync();
+            await Cli.Wrap("dotnet").WithArguments($"add package MinVer --source {source} --version {version} --package-directory packages").WithWorkingDirectory(path).ExecuteAsync();
+            await Cli.Wrap("dotnet").WithArguments($"restore --source {source} --packages packages").WithWorkingDirectory(path).ExecuteAsync();
 
             return path;
         }
 
-        public static async Task CleanAndPack(string path, int buildNumber, string output, string verbosity, Action<IDictionary<string, string>> configureEnvironment = null)
+        public static async Task CleanAndPack(string path, int buildNumber, string output, string verbosity, Action<EnvironmentVariablesBuilder> configure = null)
         {
             EnsureEmptyDirectory(output);
 
             var noLogo = (Tests.Sdk?.StartsWith("2.") ?? false) ? "" : " --nologo";
 
-            await RunAsync("dotnet", $"build --no-restore{noLogo}", path, configureEnvironment: configureEnvironment);
-            await RunAsync(
-                "dotnet",
-                $"pack --no-build --output {output}{noLogo}",
-                path,
-                configureEnvironment: env =>
+            _ = await Cli.Wrap("dotnet").WithArguments($"build --no-restore{noLogo}").WithWorkingDirectory(path).WithEnvironmentVariables(configure ?? (_ => { })).ExecuteAsync();
+            _ = await Cli.Wrap("dotnet")
+                .WithArguments($"pack --no-build --output {output}{noLogo}")
+                .WithWorkingDirectory(path)
+                .WithEnvironmentVariables(builder =>
                 {
-                    configureEnvironment?.Invoke(env);
-                    env.Add("MinVerBuildMetadata".ToAltCase(), $"build.{buildNumber}");
-                    env.Add("MinVerVerbosity".ToAltCase(), verbosity ?? "");
-                    env.Add("NoPackageAnalysis", "true");
-                });
+                    configure?.Invoke(builder);
+                    _ = builder
+                        .Set("MinVerBuildMetadata".ToAltCase(), $"build.{buildNumber}")
+                        .Set("MinVerVerbosity".ToAltCase(), verbosity ?? "")
+                        .Set("NoPackageAnalysis", "true")
+                        .Build();
+                })
+                .ExecuteAsync();
         }
     }
 }
