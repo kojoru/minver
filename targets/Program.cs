@@ -303,7 +303,7 @@ $@"{{
 
     Target("test-package", "test the MinVer package and the minver-cli console app", DependsOn("test-package-skip"));
 
-    Target("default", DependsOn("test-lib", "test-package"));
+    Target("default", DependsOn("test-lib", "test-packages"));
 
     RunTargetsAndExit(targets, options);
 }
