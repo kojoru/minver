@@ -90,29 +90,8 @@ $@"{{
         });
 
     Target(
-        "test-package-commit",
-        DependsOn("create-test-project"),
-        async () =>
-        {
-            // arrange
-            await PrepareForCommits(testProject);
-            await Commit(testProject);
-
-            var output = Path.Combine(testPackageBaseOutput, $"{buildNumber}-test-package-commit");
-
-            // act
-            await CleanAndPack(testProject, output, "diagnostic", packageTestsSdk);
-
-            // assert
-            AssertVersion(new Version(0, 0, 0, new[] { "alpha", "0" }), output);
-
-            // cli
-            Assert.Equal($"0.0.0-alpha.0+build.{buildNumber}", await RunCliAsync(testProject, "trace"));
-        });
-
-    Target(
         "test-package-non-version-tag",
-        DependsOn("test-package-commit"),
+        DependsOn("create-test-project"),
         async () =>
         {
             // arrange

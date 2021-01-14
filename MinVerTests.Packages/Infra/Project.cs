@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CliWrap;
 using CliWrap.Builders;
-using MinVerTests.Packages.Infra;
 using static MinVerTests.Infra.FileSystem;
 
-namespace MinVerTests.Packages
+namespace MinVerTests.Packages.Infra
 {
     public static class Project
     {

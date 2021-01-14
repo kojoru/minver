@@ -6,15 +6,17 @@ using Xunit;
 
 namespace MinVerTests.Packages
 {
-    public static class NoCommits
+    public static class Commit
     {
         [Fact]
-        public static async Task NoCommitsHasDefaultVersion()
+        public static async Task CommitHasDefaultVersion()
         {
             // arrange
-            var output = Path.Combine(Tests.TestPackageBaseOutput, "no-commits");
-            var project = await Project.Create("no-commits");
+            var output = Path.Combine(Tests.TestPackageBaseOutput, "commit");
+            var project = await Project.Create("commit");
             await Git.Init(project);
+            await Git.PrepareForCommits(project);
+            await Git.Commit(project);
 
             // act
             await Project.CleanAndPack(project, 123, output, "diagnostic");
